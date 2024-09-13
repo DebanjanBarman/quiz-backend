@@ -1,16 +1,35 @@
-const dotenv = require("dotenv")
-const cors = require("cors")
+const dotenv = require("dotenv");
+const express = require("express");
+const cors = require("cors");
+
+const userRouter = require("./routes/userRoutes");
+const quizRouter = require("./routes/quizRoutes");
+const questionRouter = require("./routes/questionRoutes");
+const optionsRouter = require("./routes/optionsRoutes");
+const answersRouter = require("./routes/answersRouter");
+const responsesRouter = require("./routes/responsesRouter");
 const initDB = require("./DB/initDB");
 
-dotenv.config({path: "config.env"});
-
-const {app} = require("./app")
-const express = require("express");
+const app = express();
+dotenv.config({path: "./config.env"});
+const PORT = process.env.PORT;
 
 app.use(express.json({limit: "100kb"}));
 app.use(cors({origin: "*", exposedHeaders: "Content-Range"}));
 
 app.options("/", cors());
+
+app.use("/api/users", userRouter);
+app.use("/api/quiz", quizRouter);
+app.use("/api/question", questionRouter);
+app.use("/api/options", optionsRouter);
+app.use("/api/answer", answersRouter);
+app.use("/api/response", responsesRouter);
+
+
+app.get("/", (req, res) => {
+    res.send("working");
+});
 
 (async () => {
     const db = await initDB.initializeDB();
@@ -21,7 +40,7 @@ app.options("/", cors());
     }
 })();
 
-const PORT = process.env.PORT || 5000;
-app.listen(5000, () => {
-    console.log("Server started on port: " + PORT);
-})
+
+app.listen(PORT, () => {
+    console.log(`App running on port ${PORT}`);
+});

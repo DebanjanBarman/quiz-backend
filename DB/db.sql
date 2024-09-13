@@ -63,17 +63,22 @@ CREATE TABLE IF NOT EXISTS Quizzes
 (
     id          UUID PRIMARY KEY,
     title       VARCHAR(255) NOT NULL,
+    thumbnail   VARCHAR(255),
     description TEXT,
-    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by  UUID         REFERENCES USER_DETAILS (ID) ON DELETE SET NULL
+    visible     BOOLEAN     DEFAULT FALSE,
+    status      VARCHAR(10) DEFAULT 'WAITING',
+    created_by  UUID         REFERENCES USER_DETAILS (ID) ON DELETE SET NULL,
+    created_at  TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 3. Questions table
 CREATE TABLE IF NOT EXISTS Questions
 (
-    id            UUID PRIMARY KEY,
-    quiz_id       UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
-    question_text TEXT NOT NULL
+    id             UUID PRIMARY KEY,
+    quiz_id        UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
+    question_type  VARCHAR(10),
+    question_text  TEXT DEFAULT NULL,
+    question_image TEXT DEFAULT NULL
 );
 
 -- 4. Options table
@@ -89,7 +94,8 @@ CREATE TABLE IF NOT EXISTS Answers
 (
     id          UUID PRIMARY KEY,
     question_id UUID REFERENCES Questions (id) ON DELETE CASCADE,
-    option_id   UUID REFERENCES Options (id) ON DELETE CASCADE
+    option_id   UUID REFERENCES Options (id) ON DELETE CASCADE,
+    UNIQUE (question_id, option_id)
 );
 
 -- 6. User_Responses table
@@ -100,5 +106,6 @@ CREATE TABLE IF NOT EXISTS User_Responses
     quiz_id            UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
     question_id        UUID REFERENCES Questions (id) ON DELETE CASCADE,
     selected_option_id UUID REFERENCES Options (id) ON DELETE CASCADE,
-    responded_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    responded_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, quiz_id, question_id, selected_option_id)
 );
