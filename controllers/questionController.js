@@ -1,5 +1,6 @@
 const {pool} = require("../DB");
 const {v4: uuidv4} = require("uuid");
+const {getOption, listOptions} = require("./optionController");
 
 const quizVisible = async (quiz_id) => {
     const visible = await pool.query(
@@ -104,6 +105,52 @@ exports.getQuestion = async (req, res) => {
         }
     }
 
+}
+
+exports.getQuestionAndOption = async (req, res) => {
+    const question_id = req.params.id;
+    // req.params.id=;
+    const question = await pool.query(
+        `SELECT *
+         FROM questions
+         WHERE id = $1`,
+        [question_id]
+    )
+    if (question.rows.length === 0) {
+        return res.status(404).json({
+            message: "Question not found"
+        })
+    } else {
+        const visible = await quizVisible(question.rows[0].quiz_id);
+
+        if (visible) {
+            const options = await pool.query(
+                `SELECT *
+                 FROM options
+                 where question_id = $1`, [question_id]
+            );
+
+            if (options.rows.length === 0) {
+                return res.status(400).json({
+                    status: "fail",
+                    message: "No options exist",
+                })
+            } else {
+                return res.status(200).json({
+                    status: "success",
+                    data: {
+                        question: question.rows[0],
+                        options: options.rows
+                    },
+                })
+            }
+
+        } else {
+            return res.status(404).json({
+                message: "The quiz related to this question is either private or doesn't exist"
+            })
+        }
+    }
 }
 
 exports.listQuestions = async (req, res) => {

@@ -109,3 +109,14 @@ CREATE TABLE IF NOT EXISTS User_Responses
     responded_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (user_id, quiz_id, question_id, selected_option_id)
 );
+
+-- 7. Lifeline table
+
+CREATE TABLE IF NOT EXISTS USER_LIFELINE
+(
+    ID                  UUID PRIMARY KEY,
+    QUIZ_ID             UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
+    USER_ID             UUID REFERENCES USER_DETAILS (id) ON DELETE CASCADE,
+    INCORRECT_RESPONSES INT DEFAULT 0,
+    UNIQUE (QUIZ_ID, USER_ID)
+)

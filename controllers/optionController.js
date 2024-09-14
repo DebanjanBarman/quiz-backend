@@ -163,12 +163,12 @@ exports.getOption = async (req, res) => {
     })
 }
 exports.listOptions = async (req, res) => {
-    const quiz_id = req.params.id;
+    const question_id = req.params.id;
 
     const options = await pool.query(
         `SELECT *
          FROM options
-         where question_id = $1`, [quiz_id]
+         where question_id = $1`, [question_id]
     );
 
     if (options.rows.length === 0) {
