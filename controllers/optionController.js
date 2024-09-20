@@ -171,12 +171,12 @@ exports.listOptions = async (req, res) => {
          where question_id = $1`, [question_id]
     );
 
-    if (options.rows.length === 0) {
-        return res.status(404).send({
-            "status": "fail",
-            message: "Question doesn't exit"
-        })
-    }
+    // if (options.rows.length === 0) {
+    //     return res.status(404).send({
+    //         "status": "fail",
+    //         message: "Question doesn't exit"
+    //     })
+    // }
     return res.status(200).json({
         message: "success",
         data: options.rows,

@@ -1,10 +1,10 @@
 const pool = require("../DB/index.js").pool;
-const { v4: uuidv4 } = require("uuid");
+const {v4: uuidv4} = require("uuid");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const signToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
+    return jwt.sign({id}, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN,
     });
 };
@@ -42,7 +42,7 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
     if (!email || !password) {
         return res.status(400).json({
             message: "please provide email and password",
@@ -115,7 +115,7 @@ exports.protect = async (req, res, next) => {
         req.user = freshUser.rows[0];
         next();
     } catch (e) {
-        return res.status(400).json({
+        return res.status(401).json({
             message: "You're not logged in",
         });
     }
