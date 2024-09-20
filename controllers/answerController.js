@@ -51,16 +51,15 @@ exports.getAnswer = async (req, res) => {
          WHERE question_id = $1`,
         [question_id]
     )
-    if (answer.rows.length === 0) {
-        return res.status(404).json({
-            status: "fail",
-            message: "Either question doesn't exit or answer is not added"
-        })
-    }
+    // if (answer.rows.length === 0) {
+    //     return res.status(404).json({
+    //         status: "fail",
+    //         message: "Either question doesn't exit or answer is not added"
+    //     })
+    // }
     return res.status(200).json({
         message: "success",
         data: answer.rows
-
     })
 }
 
