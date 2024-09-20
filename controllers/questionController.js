@@ -2,9 +2,9 @@ const {pool} = require("../DB");
 const {v4: uuidv4} = require("uuid");
 const {getOption, listOptions} = require("./optionController");
 
-const quizVisible = async (quiz_id) => {
+const quizVisible = async (quiz_id, user_id) => {
     const visible = await pool.query(
-        `SELECT visible
+        `SELECT visible, created_by
          from quizzes
          WHERE id = $1`,
         [quiz_id]
@@ -12,7 +12,7 @@ const quizVisible = async (quiz_id) => {
     if (visible.rows.length === 0) {
         return false;
     }
-    return visible.rows[0].visible;
+    return visible.rows[0].visible || visible.rows[0].created_by === user_id;
 }
 
 const verifyOwner = async (quiz_id, user_id) => {
@@ -92,7 +92,7 @@ exports.getQuestion = async (req, res) => {
             message: "Question not found"
         })
     } else {
-        const visible = await quizVisible(question.rows[0].quiz_id);
+        const visible = await quizVisible(question.rows[0].quiz_id, req.user.id);
 
         if (visible) {
             return res.status(200).json({
@@ -121,7 +121,7 @@ exports.getQuestionAndOption = async (req, res) => {
             message: "Question not found"
         })
     } else {
-        const visible = await quizVisible(question.rows[0].quiz_id);
+        const visible = await quizVisible(question.rows[0].quiz_id, req.user.id);
 
         if (visible) {
             const options = await pool.query(
@@ -154,9 +154,9 @@ exports.getQuestionAndOption = async (req, res) => {
 }
 
 exports.listQuestions = async (req, res) => {
-    const visible = await quizVisible(req.params.id);
+    const visible = await quizVisible(req.params.id, req.user.id);
 
-    if (visible) {
+    if (visible || req.user.id !== req.user.id) {
         const list = await pool.query(
             `SELECT *
              FROM questions
