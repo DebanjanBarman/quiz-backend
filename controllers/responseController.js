@@ -253,3 +253,34 @@ exports.getEndingTime = async (req, res) => {
         })
     }
 }
+
+exports.checkParticipation = async (req, res) => {
+    const user_id = req.user.id;
+    const quiz_id = req.params.quiz_id;
+
+    try {
+        const response = await pool.query(
+            `SELECT *
+             FROM USER_QUIZ_SCORE
+             WHERE user_id = $1
+               AND quiz_id = $2
+            `, [user_id, quiz_id]
+        );
+        if (response.rows.length === 0) {
+            return res.status(400).json({
+                status: "success",
+                message: "Not Participated"
+            })
+        }
+        return res.status(200).json({
+            status: "success",
+            data: response.rows[0]
+        })
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({
+            status: "fail",
+            message: "something went wrong"
+        })
+    }
+}
