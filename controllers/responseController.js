@@ -225,3 +225,30 @@ exports.checkEligibility = async (req, res) => {
     })
 
 }
+
+exports.getEndingTime = async (req, res) => {
+    const user_id = req.user.id;
+    const quiz_id = req.params.quiz_id;
+
+    try {
+        const response = await pool.query(
+            `SELECT end_time
+             FROM USER_QUIZ_SCORE
+             WHERE user_id = $1
+               AND quiz_id = $2`, [user_id, quiz_id]
+        )
+
+        console.log(response.rows)
+
+        return res.status(200).json({
+            message: "success",
+            response: response.rows
+        })
+
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({
+            message: "failed"
+        })
+    }
+}
