@@ -1,12 +1,19 @@
 const express = require("express");
-const {authorizeAdmin, protect} = require("../controllers/authController");
+const {protect} = require("../controllers/authController");
 
-const {createResponse, getResponse} = require("../controllers/responseController");
+const {
+    createResponse,
+    getResponse,
+    getFullResponse,
+    finishResponse,
+    checkEligibility
+} = require("../controllers/responseController");
 const router = express.Router();
 
 router.get("/", protect, getResponse);
+router.get("/:quiz_id", protect, getFullResponse);
 router.post("/", protect, createResponse);
-
-
+router.patch("/:quiz_id", protect, finishResponse);
+router.get("/eligible/:quiz_id", protect, checkEligibility);
 module.exports = router;
 

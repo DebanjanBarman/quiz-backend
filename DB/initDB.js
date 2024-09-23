@@ -92,5 +92,24 @@ exports.initializeDB = async () => {
         throw new Error("Creation of Tables Failed");
     }
 
+    const USER_QUIZ_STATUS = await pool.query(`
+        CREATE TABLE IF NOT EXISTS USER_QUIZ_SCORE
+        (
+            ID                UUID PRIMARY KEY,
+            QUIZ_ID           UUID NOT NULL REFERENCES Quizzes (id) ON DELETE CASCADE,
+            USER_ID           UUID NOT NULL REFERENCES USER_DETAILS (id) ON DELETE CASCADE,
+            START_TIME        int8,
+            END_TIME          int8,
+            ACTUAL_END_TIME   int8,
+            ENDED             BOOLEAN,
+            INCORRECT_ANSWERS INT DEFAULT 0,
+            SCORE             INT DEFAULT 0,
+            UNIQUE (QUIZ_ID, USER_ID)
+        );`)
+    if (USER_QUIZ_STATUS) {
+        console.log("USER_QUIZ_STATUS TABLE CREATED/NOT TOUCHED");
+    } else {
+        throw new Error("Creation of Tables Failed");
+    }
     return true;
 }

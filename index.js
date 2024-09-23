@@ -8,6 +8,8 @@ const questionRouter = require("./routes/questionRoutes");
 const optionsRouter = require("./routes/optionsRoutes");
 const answersRouter = require("./routes/answersRouter");
 const responsesRouter = require("./routes/responsesRouter");
+const adminRouter = require("./routes/adminRoutes");
+const resultRouter = require("./routes/resultRoutes")
 const initDB = require("./DB/initDB");
 
 const app = express();
@@ -25,6 +27,8 @@ app.use("/api/question", questionRouter);
 app.use("/api/options", optionsRouter);
 app.use("/api/answer", answersRouter);
 app.use("/api/response", responsesRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/result", resultRouter);
 
 
 app.get("/", (req, res) => {

@@ -109,3 +109,26 @@ exports.deleteAnswer = async (req, res) => {
     }
 
 }
+
+exports.validateAnswer = async (question_id, selected_option_id) => {
+
+    try {
+        const answer = await pool.query(
+            `SELECT *
+             FROM answers
+             WHERE question_id = $1`,
+            [question_id]
+        );
+
+        if (answer.rows.length === 0) {
+            return false;
+        } else {
+            console.log(answer.rows[0].option_id)
+            console.log(selected_option_id)
+            return answer.rows[0].option_id === selected_option_id;
+        }
+    } catch (err) {
+        console.log(err)
+        return false;
+    }
+}
