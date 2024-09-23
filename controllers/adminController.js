@@ -6,7 +6,7 @@ exports.admitUser = async (req, res) => {
     const quiz_id = req.body.quiz_id;
     const user_id = req.body.user_id;
     const start_time = Date.now();
-    const end_time = Date.now() + 20000;
+    const end_time = Date.now() + (1000 * 60 * 20);
     const actual_end_time = end_time;
     const finished = false;
     try {

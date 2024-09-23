@@ -18,9 +18,9 @@ const checkResponsePermission = async (user_id, quiz_id) => {
 
         if (response.rows.length === 0) {
             return false;
-        } else if (data.end_time + 5000 > Date.now()) {
+        } else if (data[0].end_time + 5000 - Date.now() < 0) {
             return false;
-        } else if (data.ended === true) {
+        } else if (data[0].ended === true) {
             return false;
         }
         return true;
@@ -146,13 +146,14 @@ exports.getFullResponse = async (req, res) => {
     const user_id = req.user.id;
 
     try {
-        const response = await pool.query(`SELECT *
-                                           FROM user_responses u
-                                                    JOIN questions q ON u.question_id = q.id
-                                                    JOIN answers a ON a.question_id = q.id
-                                           WHERE u.user_id = $1
-                                             and q.quiz_id = $2;
-        `, [user_id, quiz_id])
+        const response = await pool.query(
+            `SELECT *
+             FROM user_responses u
+                      JOIN questions q ON u.question_id = q.id
+                      JOIN answers a ON a.question_id = q.id
+             WHERE u.user_id = $1
+               and q.quiz_id = $2;
+            `, [user_id, quiz_id])
         console.log(response)
         return res.status(200).json({
             response: response.rows
@@ -187,12 +188,14 @@ exports.finishResponse = async (req, res) => {
             } else {
                 return res.status(200).json({
                     message: "success",
+                    data: response.rows[0]
                 })
             }
 
         } catch (e) {
-            return res.status(200).json({
-                message: "success",
+            console.log(e)
+            return res.status(400).json({
+                message: "fail",
             })
         }
     } else {
