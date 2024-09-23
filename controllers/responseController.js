@@ -242,7 +242,8 @@ exports.getEndingTime = async (req, res) => {
 
         return res.status(200).json({
             message: "success",
-            response: response.rows
+            response: response.rows,
+            current_time: Date.now(),
         })
 
     } catch (err) {
