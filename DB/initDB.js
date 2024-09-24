@@ -111,5 +111,21 @@ exports.initializeDB = async () => {
     } else {
         throw new Error("Creation of Tables Failed");
     }
+
+    const PENDING_REQ_TABLE = await pool.query(`
+        CREATE TABLE IF NOT EXISTS PENDING_REQUESTS
+        (
+            ID        UUID PRIMARY KEY,
+            QUIZ_ID   UUID NOT NULL REFERENCES Quizzes (id) ON DELETE CASCADE,
+            USER_ID   UUID NOT NULL REFERENCES USER_DETAILS (id) ON DELETE CASCADE,
+            USER_NAME VARCHAR(250),
+            EMAIL     VARCHAR(250),
+            UNIQUE (QUIZ_ID, USER_ID)
+        );`)
+    if (PENDING_REQ_TABLE) {
+        console.log("PENDING_REQ_TABLE TABLE CREATED/NOT TOUCHED");
+    } else {
+        throw new Error("Creation of Tables Failed");
+    }
     return true;
 }

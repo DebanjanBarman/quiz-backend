@@ -10,6 +10,7 @@ const answersRouter = require("./routes/answersRouter");
 const responsesRouter = require("./routes/responsesRouter");
 const adminRouter = require("./routes/adminRoutes");
 const resultRouter = require("./routes/resultRoutes")
+const gameLogicRouter = require("./routes/gameLogicRoutes")
 const initDB = require("./DB/initDB");
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/answer", answersRouter);
 app.use("/api/response", responsesRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/result", resultRouter);
+app.use("/api/game", gameLogicRouter);
 
 
 app.get("/", (req, res) => {

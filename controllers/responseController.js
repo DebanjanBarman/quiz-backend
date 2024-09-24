@@ -18,7 +18,7 @@ const checkResponsePermission = async (user_id, quiz_id) => {
 
         if (response.rows.length === 0) {
             return false;
-        } else if (data[0].end_time + 5000 - Date.now() < 0) {
+        } else if ((parseInt(data[0].end_time) + 5000) - Date.now() < 0) {
             return false;
         } else if (data[0].ended === true) {
             return false;
