@@ -1,5 +1,8 @@
 const dotenv = require("dotenv");
 const express = require("express");
+const {Server} = require("socket.io");
+const {init} = require('./socket');
+const {createServer} = require('http');
 const cors = require("cors");
 
 const userRouter = require("./routes/userRoutes");
@@ -14,6 +17,9 @@ const gameLogicRouter = require("./routes/gameLogicRoutes")
 const initDB = require("./DB/initDB");
 
 const app = express();
+const server = createServer(app);
+const io = init(server)
+
 dotenv.config({path: "./config.env"});
 const PORT = process.env.PORT;
 
@@ -32,6 +38,14 @@ app.use("/api/admin", adminRouter);
 app.use("/api/result", resultRouter);
 app.use("/api/game", gameLogicRouter);
 
+io.on('connection', (socket) => {
+    console.log('a user connected', socket.id);
+    // socket.emit("quiz_updated", {data: "Fetch the quizzes data again"})
+    socket.broadcast.emit("quiz_updated", {data: "fetch the quizzes data again"})
+    socket.on("quiz_updated", (arg) => {
+        console.log(arg);
+    });
+});
 
 app.get("/", (req, res) => {
     res.send("working");
@@ -47,6 +61,6 @@ app.get("/", (req, res) => {
 })();
 
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`App running on port ${PORT}`);
 });

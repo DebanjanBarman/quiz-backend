@@ -1,5 +1,7 @@
 const {v4: uuidv4} = require("uuid");
 const {pool} = require("../DB");
+const {getIo} = require('../socket');
+
 
 exports.createQuiz = async (req, res) => {
     let id = uuidv4();
@@ -21,7 +23,11 @@ exports.createQuiz = async (req, res) => {
 
     try {
         let quiz = await pool.query("INSERT INTO QUIZZES VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id,title", [id, title, description, thumbnail, visible, status, created_by]);
-        res.status(201).json({
+
+        const io = getIo();
+        io.emit("quiz_updated");
+
+        return res.status(201).json({
             message: "quiz created successfully", quiz_id: quiz.rows[0].id, quiz_title: quiz.rows[0].title,
         })
     } catch (err) {
@@ -101,6 +107,11 @@ exports.deleteQuiz = async (req, res) => {
         let findQuiz = await pool.query(
             "SELECT created_by FROM QUIZZES WHERE id=$1", [id]
         )
+        if (findQuiz.rows.length === 0) {
+            return res.status(404).json({
+                message: "quiz not found"
+            })
+        }
         let created_by = findQuiz.rows[0].created_by;
 
         if (created_by === user_id) {
@@ -108,7 +119,10 @@ exports.deleteQuiz = async (req, res) => {
                 "DELETE FROM QUIZZES  WHERE id=$1",
                 [id]
             );
-            res.status(200).json({
+            const io = getIo();
+            io.emit("quiz_updated");
+
+            return res.status(200).json({
                 message: "quiz DELETED successfully",
             })
         } else {
@@ -118,6 +132,7 @@ exports.deleteQuiz = async (req, res) => {
         }
 
     } catch (err) {
+        console.log(err)
         return res.status(400).json({
             message: "something went wrong", error: err
         })
@@ -159,7 +174,11 @@ exports.editQuiz = async (req, res) => {
                 "UPDATE QUIZZES SET title=$1,description=$2,thumbnail=$3,visible=$4,status=$5  WHERE id=$6 RETURNING *",
                 [title, description, thumbnail, visible, status, id]
             );
-            res.status(200).json({
+
+            const io = getIo();
+            io.emit("quiz_updated");
+
+            return res.status(200).json({
                 message: "quiz updated successfully",
                 quiz: quiz.rows[0]
             })
