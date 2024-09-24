@@ -1,5 +1,6 @@
 const {v4: uuidv4} = require("uuid");
 const pool = require("../DB/index.js").pool;
+const {getIo} = require('../socket');
 
 exports.admitUser = async (req, res) => {
     const id = uuidv4();
@@ -24,6 +25,9 @@ exports.admitUser = async (req, res) => {
             WHERE user_id = $1
               AND quiz_id = $2
         `, [user_id, quiz_id]);
+
+        const io = getIo();
+        io.emit("quiz_updated");
 
         return res.status(201).send({
             message: "Request Accepted",

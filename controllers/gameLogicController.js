@@ -1,6 +1,7 @@
 const {pool} = require("../DB");
 const {v4: uuidv4} = require("uuid");
 const {verifyOwner} = require("../utils/utils");
+const {getIo} = require('../socket');
 
 exports.joinRequest = async (req, res) => {
     const {user_id, quiz_id, user_name, user_email} = req.body;
@@ -12,16 +13,21 @@ exports.joinRequest = async (req, res) => {
                                            VALUES ($1, $2, $3, $4, $5)
                                            RETURNING *
         `, [id, quiz_id, user_id, user_name, user_email]);
-        res.status(200).send({
+
+        const io = getIo();
+        io.emit("new-join-request");
+
+        return res.status(200).send({
             message: "success", data: response.rows[0]
         })
 
     } catch (err) {
         console.log(err);
-        res.status(400).send({
-            message: "failed"
-        })
-
+        if (parseInt(err.code) === 23505) {
+            return res.status(400).send({
+                message: "You've already sent a join request"
+            })
+        }
     }
 
 }
@@ -146,7 +152,12 @@ exports.startQuiz = async (req, res) => {
                  RETURNING *`, [quiz_id]
             );
             console.log(finishQuiz.rows)
+            const io = getIo();
+            io.emit("quiz_updated");
         }, end_time - start_time);
+
+        const io = getIo();
+        io.emit("quiz_updated");
 
         return res.status(200).json({
             message: "success",
