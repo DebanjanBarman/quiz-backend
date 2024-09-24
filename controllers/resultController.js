@@ -23,3 +23,19 @@ exports.getResult = async (req, res) => {
         data: result.rows
     })
 }
+
+
+exports.listAcceptedUsers = async (req, res) => {
+    const quiz_id = req.params.quiz_id
+    const result = await pool.query(`
+        SELECT ud.name, ud.email
+        FROM user_quiz_score uqs
+                 JOIN user_details ud ON ud.id = uqs.user_id
+        WHERE uqs.quiz_id = $1
+    `, [quiz_id]);
+
+    return res.status(200).send({
+        message: "success",
+        data: result.rows
+    })
+}
