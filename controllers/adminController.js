@@ -27,7 +27,7 @@ exports.admitUser = async (req, res) => {
         `, [user_id, quiz_id]);
 
         const io = getIo();
-        io.emit("quiz_updated");
+        io.emit("new-join-request");
 
         return res.status(201).send({
             message: "Request Accepted",

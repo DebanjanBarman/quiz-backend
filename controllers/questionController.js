@@ -30,25 +30,16 @@ const verifyOwner = async (quiz_id, user_id) => {
 exports.createQuestion = async (req, res) => {
     let id = uuidv4();
     let quiz_id = req.body.quiz_id;
-    let question_type = req.body.question_type;
-    let question_text = req.body.question_text;
-    let question_image = req.body.question_image;
+    let question = req.body.question;
+
     console.log(quiz_id)
-    if (!quiz_id || !question_type) {
+    if (!quiz_id) {
         return res.status(400).json({
-            message: "please provide quiz_id and question_type"
+            message: "please provide quiz_id"
         })
-    } else if (question_type === "text" && !question_text) {
+    } else if (question.length === 0) {
         return res.status(400).json({
             message: "please provide the question"
-        })
-    } else if (question_type === "image" && !question_image) {
-        return res.status(400).json({
-            message: "please provide the question image link"
-        })
-    } else if (question_type === "both" && (!question_text || !question_image)) {
-        return res.status(400).json({
-            message: "please provide the question text and the image link"
         })
     }
 
@@ -56,16 +47,16 @@ exports.createQuestion = async (req, res) => {
 
     try {
         if (verified) {
-            const question = await pool.query(
+            const createdQuestion = await pool.query(
                 `INSERT INTO questions
-                 values ($1, $2, $3, $4, $5)
+                 values ($1, $2, $3)
                  RETURNING *`,
-                [id, quiz_id, question_type, question_text, question_image]
+                [id, quiz_id, question]
             )
 
             res.status(201).json({
                 message: "success",
-                question: question.rows[0]
+                question: createdQuestion.rows[0]
             })
         } else {
             return res.status(401).json({
@@ -177,25 +168,12 @@ exports.listQuestions = async (req, res) => {
 exports.updateQuestion = async (req, res) => {
     let id = req.params.id;
     let quiz_id = req.body.quiz_id;
-    let question_type = req.body.question_type;
-    let question_text = req.body.question_text;
-    let question_image = req.body.question_image;
+    let question = req.body.question;
+
     console.log(quiz_id)
-    if (!quiz_id || !question_type) {
+    if (!quiz_id || !question) {
         return res.status(400).json({
-            message: "please provide quiz_id and question_type"
-        })
-    } else if (question_type === "text" && !question_text) {
-        return res.status(400).json({
-            message: "please provide the question"
-        })
-    } else if (question_type === "image" && !question_image) {
-        return res.status(400).json({
-            message: "please provide the question image link"
-        })
-    } else if (question_type === "both" && (!question_text || !question_image)) {
-        return res.status(400).json({
-            message: "please provide the question text and the image link"
+            message: "please provide quiz_id and question"
         })
     }
 
@@ -203,23 +181,21 @@ exports.updateQuestion = async (req, res) => {
 
     try {
         if (verified) {
-            const question = await pool.query(
+            const updatedQuestion = await pool.query(
                 `UPDATE questions
-                 set question_type=$1,
-                     question_text=$2,
-                     question_image= $3
-                 WHERE id = $4
+                 set question=$1
+                 WHERE id = $2
                  RETURNING *`,
-                [question_type, question_text, question_image, id]
+                [question, id]
             )
-            if (question.rows.length === 0) {
+            if (updatedQuestion.rows.length === 0) {
                 return res.status(404).json({
                     message: "Question not found"
                 })
             } else {
                 return res.status(200).json({
                     message: "success",
-                    question: question.rows[0]
+                    question: updatedQuestion.rows[0]
                 })
             }
 

@@ -74,11 +74,9 @@ CREATE TABLE IF NOT EXISTS Quizzes
 -- 3. Questions table
 CREATE TABLE IF NOT EXISTS Questions
 (
-    id             UUID PRIMARY KEY,
-    quiz_id        UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
-    question_type  VARCHAR(10),
-    question_text  TEXT DEFAULT NULL,
-    question_image TEXT DEFAULT NULL
+    id       UUID PRIMARY KEY,
+    quiz_id  UUID REFERENCES Quizzes (id) ON DELETE CASCADE,
+    question VARCHAR(2000) DEFAULT '### YOUR QUESTION HERE'
 );
 
 -- 4. Options table
