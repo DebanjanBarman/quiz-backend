@@ -13,7 +13,7 @@ exports.getResult = async (req, res) => {
          FROM user_quiz_score uqs
                   JOIN user_details ud ON ud.id = uqs.user_id
          WHERE quiz_id = $1
-         ORDER BY score
+         ORDER BY score DESC
         `, [quiz_id]
     );
 
