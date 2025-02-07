@@ -151,7 +151,8 @@ exports.listQuestions = async (req, res) => {
         const list = await pool.query(
             `SELECT *
              FROM questions
-             where quiz_id = $1`,
+             where quiz_id = $1
+             ORDER BY RANDOM()`,
             [req.params.id]
         )
         res.status(200).json({
